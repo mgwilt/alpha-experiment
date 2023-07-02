@@ -6,17 +6,6 @@ import inspect
 from typing import Dict
 from alpha_vantage import AlphaVantage
 
-# earnings per share
-# quarterly revenue growth yoy
-# price to earnings ratio
-# return on equity
-# current price
-# 52 week high
-# 52 week low
-# RSI
-# MACD
-# Debt to Equity Ratio D/E (calculated from balance sheet data total liabalities / total shareholder equity)
-
 config = configparser.ConfigParser()
 config.read("config.ini")
 
@@ -53,21 +42,55 @@ def generate_schema(func):
             schema["parameters"]["required"].append(param_name)
     return schema
 
-# print(generate_schema(alpha_vantage.get_bbands))
+class Command:
+    """
+    A command object that wraps a function call with its arguments and keyword arguments.
+    """
+    def __init__(self, func_name: str, *args, **kwargs):
+        self.func_name = func_name
+        self.args = args
+        self.kwargs = kwargs
+
+    def execute(self):
+        func = globals()[self.func_name]
+        return func(*self.args, **self.kwargs)
+
+def execute_commands_in_order(commands: list) -> dict:
+    """
+    Execute a list of commands in order and aggregate the results into one dictionary.
+
+    Parameters:
+    commands (list): A list of Command objects to be executed in order.
+
+    Returns:
+    dict: A dictionary containing the results of each command execution.
+    """
+    results = {}
+    for command in commands:
+        result = command.execute()
+        results[command.func.__name__] = result
+    return results
 
 def run_conversation():
     # Step 1: send the conversation and available functions to GPT
-    messages = [{"role": "user", "content": "Get the 14 day RSI for IBM"}]
+    messages = [{"role": "user", "content": "Using fundamental and technical analysis recommend buy/sell/hold for IBM."}]
     functions = [
+        generate_schema(execute_commands_in_order),
+        generate_schema(alpha_vantage.Fundamental.get_earnings_per_share),
+        generate_schema(alpha_vantage.Fundamental.get_quarterly_revenue_growth_yoy),
+        generate_schema(alpha_vantage.Fundamental.get_pe_ratio),
         generate_schema(alpha_vantage.Fundamental.get_roe),
-        # generate_schema(alpha_vantage.Technical.get_macd),
+        generate_schema(alpha_vantage.Fundamental.get_debt_to_equity),
+        generate_schema(alpha_vantage.Technical.get_52_week_high),
+        generate_schema(alpha_vantage.Technical.get_52_week_low),
         generate_schema(alpha_vantage.Technical.get_rsi),
+        # generate_schema(alpha_vantage.Technical.get_macd),
     ]
     response = openai.ChatCompletion.create(
         model="gpt-4-0613",
         messages=messages,
         functions=functions,
-        function_call="auto",  # auto is default, but we'll be explicit
+        function_call={ "name": "execute_commands_in_order" },  # auto is default, but we'll be explicit
     )
     response_message = response["choices"][0]["message"]
 
@@ -76,10 +99,7 @@ def run_conversation():
         # Step 3: call the function
         # Note: the JSON response may not always be valid; be sure to handle errors
         available_functions = {
-            "get_sma": alpha_vantage.get_sma,
-            "get_macd": alpha_vantage.get_macd,
-            "get_rsi": alpha_vantage.get_rsi,
-            #"get_bbands": alpha_vantage.get_bbands,
+            "execute_commands_in_order": execute_commands_in_order,
         }
         function_name = response_message["function_call"]["name"]
         fuction_to_call = available_functions[function_name]

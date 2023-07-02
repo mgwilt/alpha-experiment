@@ -25,6 +25,22 @@ class AlphaVantage:
     class Fundamental:
         def __init__(self, api_key: str):
             self.api_key = api_key
+
+        def get_earnings_per_share(self, symbol: str) -> float:
+            """
+            Get the earnings per share (EPS) for a given stock.
+
+            Parameters:
+            symbol (str): The stock ticker symbol.
+
+            Returns:
+            float: The earnings per share for the specified stock.
+            """
+            url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={self.api_key}"
+            response = requests.get(url)
+            data = response.json()
+            eps = float(data["EPS"])
+            return eps
         
         def get_quarterly_revenue_growth_yoy(self, symbol: str) -> float:
             """

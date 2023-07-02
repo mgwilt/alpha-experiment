@@ -60,7 +60,7 @@ def run_conversation():
     messages = [{"role": "user", "content": "Get the 14 day RSI for IBM"}]
     functions = [
         generate_schema(alpha_vantage.Fundamental.get_roe),
-        generate_schema(alpha_vantage.Technical.get_macd),
+        # generate_schema(alpha_vantage.Technical.get_macd),
         generate_schema(alpha_vantage.Technical.get_rsi),
     ]
     response = openai.ChatCompletion.create(

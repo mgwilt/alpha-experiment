@@ -6,6 +6,16 @@ import inspect
 from typing import Dict
 from alpha_vantage import AlphaVantage
 
+# earnings per share
+# quarterly revenue growth yoy
+# price to earnings ratio
+# return on equity
+# current price
+# 52 week high
+# 52 week low
+# RSI
+# MACD
+# Debt to Equity Ratio D/E (calculated from balance sheet data total liabalities / total shareholder equity)
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -49,10 +59,9 @@ def run_conversation():
     # Step 1: send the conversation and available functions to GPT
     messages = [{"role": "user", "content": "Get the 14 day RSI for IBM"}]
     functions = [
-        generate_schema(alpha_vantage.get_sma),
-        generate_schema(alpha_vantage.get_macd),
-        generate_schema(alpha_vantage.get_rsi),
-        # generate_schema(alpha_vantage.get_bbands),
+        generate_schema(alpha_vantage.Fundamental.get_roe),
+        generate_schema(alpha_vantage.Technical.get_macd),
+        generate_schema(alpha_vantage.Technical.get_rsi),
     ]
     response = openai.ChatCompletion.create(
         model="gpt-4-0613",

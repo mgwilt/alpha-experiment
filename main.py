@@ -47,7 +47,7 @@ def generate_schema(func):
 
 def run_conversation():
     # Step 1: send the conversation and available functions to GPT
-    messages = [{"role": "user", "content": "Get the RSI for AAPL"}]
+    messages = [{"role": "user", "content": "Get the 14 day RSI for IBM"}]
     functions = [
         generate_schema(alpha_vantage.get_sma),
         generate_schema(alpha_vantage.get_macd),
@@ -70,8 +70,8 @@ def run_conversation():
             "get_sma": alpha_vantage.get_sma,
             "get_macd": alpha_vantage.get_macd,
             "get_rsi": alpha_vantage.get_rsi,
-            "get_bbands": alpha_vantage.get_bbands,
-        }  # only one function in this example, but you can have multiple
+            #"get_bbands": alpha_vantage.get_bbands,
+        }
         function_name = response_message["function_call"]["name"]
         fuction_to_call = available_functions[function_name]
         function_args = json.loads(response_message["function_call"]["arguments"])

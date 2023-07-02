@@ -21,6 +21,17 @@ class AlphaVantage:
     def __init__(self, api_key: str):
         self.api_key = api_key
 
+    # earnings per share
+    # quarterly revenue growth yoy
+    # price to earnings ratio
+    # return on equity
+    # current price
+    # 52 week high
+    # 52 week low
+    # RSI
+    # MACD
+    # Debt to Equity Ratio D/E (calculated from balance sheet data total liabalities / total shareholder equity)
+
     def get_sma(
         self,
         symbol: str,

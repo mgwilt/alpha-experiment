@@ -55,6 +55,14 @@ class Command:
         func = globals()[self.func_name]
         return func(*self.args, **self.kwargs)
 
+
+# sample commands
+# I'd like to *not* have a bunch of round trips with GPT. I'm not made of money.
+# commands = [
+#     Command("get_earnings_per_share", symbol="IBM"),
+#     Command("get_quarterly_revenue_growth_yoy", symbol="IBM")
+# ]
+
 def execute_commands_in_order(commands: list) -> dict:
     """
     Execute a list of commands in order and aggregate the results into one dictionary.
